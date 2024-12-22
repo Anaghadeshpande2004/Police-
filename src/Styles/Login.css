@@ -1,0 +1,127 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  color: #333;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Increased height of the container (120% of the viewport height) */
+  padding: 10px;
+}
+
+.login-box {
+  display: flex; /* This ensures the image and form are side by side */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px; /* Optional: Limit max-width to prevent overflow */
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow around the form */
+  height: 80vh; /* Increased height to 80% of the viewport height, adjust as needed */
+}
+
+
+.image-section {
+  width: 60%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.image-section img {
+  width: 100%;
+  max-width: 450px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  width: 60%;
+}
+
+h2 {
+  margin-bottom: 25px;
+  color: #5f6368;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.textbox {
+  margin-bottom: 20px;
+}
+
+.textbox input {
+  width: 100%;
+  padding: 18px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.textbox input:focus {
+  border-color: #4e73df;
+  outline: none;
+}
+
+button.login-btn {
+  width: 100%;
+  padding: 18px;
+  background-color: #4e73df;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button.login-btn:hover {
+  background-color: #2e59d9;
+}
+
+.signup-link {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signup-link a {
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: none;
+  transition: text-decoration 0.3s ease;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.terms {
+  margin-top: 25px;
+  font-size: 13px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.terms a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}

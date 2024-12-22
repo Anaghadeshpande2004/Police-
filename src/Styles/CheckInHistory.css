@@ -1,0 +1,62 @@
+/* Styling for the chart container */
+.chart-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Full width */
+  height: 300px; /* Fixed height for the container */
+  box-sizing: border-box; /* Ensure padding is included in height calculation */
+  overflow: hidden; /* Prevent overflow of chart content */
+  display: flex; /* Flexbox for content alignment */
+  justify-content: center; /* Center the chart horizontally */
+  align-items: center; /* Center the chart vertically */
+  flex-direction: column; /* Arrange title and chart in column */
+}
+
+/* Styling for the chart title */
+.chart-title {
+  color: #3d3d3d;
+  font-size: 18px;
+  margin-bottom: 20px;
+  background-color: transparent;
+  text-align: left; /* Align title to the left */
+  width: 100%; /* Ensure it takes full width to align text */
+  padding-left: 20px; /* Optional: Adds padding for left alignment */
+}
+
+/* Ensures the canvas is responsive */
+.chart-container canvas {
+  max-width: 100%; /* Make sure the canvas takes up 100% of the container width */
+  max-height: 100%; /* Ensure the canvas doesn't exceed the container height */
+  display: block; /* Prevent extra spacing under canvas */
+}
+
+/* Styling for the "View Details" button */
+.view-details-btn {
+  margin-top: 30px; /* Add space between chart and button */
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for the button */
+.view-details-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Focus style for button (for accessibility) */
+.view-details-btn:focus {
+  outline: 3px solid #0056b3;
+}
+
+/* Hover effect for the chart title */
+.chart-title:hover {
+  color: #007bff; /* Change color on hover */
+  cursor: pointer;
+}

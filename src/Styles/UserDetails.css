@@ -1,0 +1,65 @@
+.user-details-container {
+    width: 100%;
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 405px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: flex-start; /* Align heading to the left */
+    align-items: center;
+    margin-bottom: 20px;
+    
+  }
+  
+  .header h2 {
+    color: black;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+  }
+  
+  .details-button {
+    align-self: flex-end; /* Align button to the bottom right */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px; /* Increased space between the button and the content */
+}
+
+  
+  .details-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .user-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .user-item {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .status-active {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .status-inactive {
+    color: red;
+    font-weight: bold;
+  }
+  

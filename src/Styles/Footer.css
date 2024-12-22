@@ -1,0 +1,17 @@
+/* Footer styles */
+.footer {
+    background-color: #041a59; /* Dark blue background */
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .footer p {
+    margin: 0;
+    font-size: 14px;
+  }
