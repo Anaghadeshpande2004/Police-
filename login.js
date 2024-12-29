@@ -90,137 +90,190 @@ app.post('/api/suspects', upload.single('file'), (req, res) => {
   });
 });
 
-// **Accommodation API**
-// Fetch active/inactive accommodations
-app.get('/api/accommodations', (req, res) => {
-  const { status } = req.query;
 
+
+
+// Endpoint to get customers based on date range
+app.get("/api/customers", (req, res) => {
+  const { fromDate, toDate } = req.query;
+  console.log("Received fromDate:", fromDate, "toDate:", toDate); // Debugging
+
+  // MySQL query to fetch customers based on date range
   const query = `
-    SELECT hotelName, type, status 
-    FROM accommodations 
-    WHERE status = ?
+    SELECT c.CustomerID, c.Name, c.CheckInDate, c.CheckInTime, c.CheckOutDate, c.RoomAllocated, h.HotelName
+    FROM Customers c
+    JOIN Hotels h ON c.HotelID = h.HotelID
+    WHERE c.CheckInDate BETWEEN ? AND ?
   `;
-
-  db.query(query, [status], (err, results) => {
-    if (err) {
-      console.error('Error fetching accommodations:', err);
-      return res.status(500).json({ message: 'Failed to fetch accommodations' });
-    }
-    res.status(200).json(results);
+  
+  db.query(query, [fromDate, toDate], (err, results) => {
+    if (err) return res.status(500).send(err);
+    res.json(results); // Return the customers as a JSON response
   });
 });
 
-// **Add Accommodation API with Image Upload**
-app.post('/api/accommodations', upload.single('image'), (req, res) => {
-  const { hotelName, type, status } = req.body;
-  const imageUpload = req.file ? req.file.filename : null;
 
-  const query = `
-    INSERT INTO accommodations (hotelName, type, status, image)
-    VALUES (?, ?, ?, ?)
-  `;
 
-  db.query(query, [hotelName, type, status, imageUpload], (err, result) => {
+// Endpoint to fetch station profile data
+app.get("/api/station-profile", (req, res) => {
+  const query = "SELECT * FROM StationProfile LIMIT 1";
+  db.query(query, (err, result) => {
     if (err) {
-      console.error('Database insertion error: ', err);
-      return res.status(500).json({ message: 'Database error' });
+      console.error("Error fetching station profile data:", err);
+      res.status(500).send("Server error");
+    } else {
+      res.json(result[0]);
     }
-    res.status(200).json({ message: 'Accommodation added successfully', accommodationId: result.insertId });
   });
 });
 
-// **Update Accommodation Status API**
-app.put('/api/accommodations/:id', (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
+
+// Endpoint to update station profile data
+app.put("/api/station-profile", (req, res) => {
+  const {
+    name,
+    location,
+    contact,
+    email,
+    officers_count,
+    jurisdiction,
+    established,
+    station_head_name,
+    station_head_image,
+  } = req.body;
 
   const query = `
-    UPDATE accommodations 
-    SET status = ? 
-    WHERE id = ?
+    UPDATE StationProfile SET
+    name = ?, location = ?, contact = ?, email = ?, officers_count = ?, jurisdiction = ?, established = ?, 
+    station_head_name = ?, station_head_image = ?
+    WHERE id = 1;
   `;
 
-  db.query(query, [status, id], (err, result) => {
-    if (err) {
-      console.error('Database update error: ', err);
-      return res.status(500).json({ message: 'Failed to update accommodation' });
+  db.query(
+    query,
+    [
+      name,
+      location,
+      contact,
+      email,
+      officers_count,
+      jurisdiction,
+      established,
+      station_head_name,
+      station_head_image,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating station profile data:", err);
+        res.status(500).send("Server error");
+      } else {
+        res.json({ message: "Profile updated successfully" });
+      }
     }
-    res.status(200).json({ message: 'Accommodation status updated' });
-  });
+  );
 });
 
-// **Accommodation Counts API**
+
 app.get('/api/accommodations/counts', (req, res) => {
   const query = `
     SELECT 
-      COUNT(CASE WHEN status = 'active' THEN 1 END) AS active,
-      COUNT(CASE WHEN status = 'inactive' THEN 1 END) AS inactive
-    FROM accommodations
+      SUM(CASE WHEN r.availability_status = 'Occupied' THEN 1 ELSE 0 END) AS active,
+      SUM(CASE WHEN r.availability_status = 'Available' THEN 1 ELSE 0 END) AS inactive
+    FROM room r;
   `;
 
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching accommodation counts:', err);
-      return res.status(500).json({ message: 'Failed to fetch accommodation counts' });
+      res.status(500).send({ error: 'Database query failed' });
+      return;
     }
-
-    const counts = results[0];
-    res.status(200).json({
-      active: counts.active,
-      inactive: counts.inactive
-    });
+    res.send(results[0]); // Return the first row with counts
   });
 });
 
-app.get("/api/checkin-details", (req, res) => {
+// Define the /api/accommodations route
+app.get('/api/accommodations', (req, res) => {
   const query = `
     SELECT 
-      h.history_id, 
-      h.customer_id, 
-      c.name AS customer_name, 
-      h.check_in_date, 
-      IF(h.check_in_time = '0000-00-00 00:00:00', NULL, h.check_in_time) AS check_in_time,
-      h.check_out_date 
-    FROM 
-      checkinhistory h
-    INNER JOIN 
-      customer c 
-    ON 
-      h.customer_id = c.customer_id
-    ORDER BY 
-      h.check_in_date, h.check_in_time;
+      h.hotel_id,
+      h.hotel_name,
+      SUM(CASE WHEN r.availability_status = 'Occupied' THEN 1 ELSE 0 END) AS active_rooms,
+      SUM(CASE WHEN r.availability_status = 'Available' THEN 1 ELSE 0 END) AS inactive_rooms
+    FROM hotel h
+    LEFT JOIN room r ON h.hotel_id = r.hotel_id
+    GROUP BY h.hotel_id, h.hotel_name;
   `;
 
-  // Execute the query
   db.query(query, (err, results) => {
     if (err) {
-      console.error("Error executing query:", err);
-      return res.status(500).json({ error: 'Internal Server Error', message: err.message });
+      console.error('Error fetching accommodations:', err);
+      res.status(500).send({ error: 'Database query failed' });
+      return;
     }
+    res.json(results);
+  });
+});
 
-    // Check if results are empty
-    if (results.length === 0) {
-      return res.status(200).json({ message: "No check-in data available" });
+  
+app.get('/api/hotel-details/:hotelId', (req, res) => {
+  const hotelId = req.params.hotelId;
+  const query = `
+    SELECT h.hotel_name, h.hotel_id, r.room_id, c.customer_id, c.name AS customer_name, r.availability_status
+    FROM hotel h
+    LEFT JOIN room r ON h.hotel_id = r.hotel_id
+    LEFT JOIN bookings b ON r.room_id = b.room_id
+    LEFT JOIN customer c ON b.customer_id = c.customer_id
+    WHERE h.hotel_id = ?;
+  `;
+
+  db.query(query, [hotelId], (err, results) => {
+    if (err) {
+      console.error('Error fetching hotel details:', err);
+      res.status(500).send({ error: 'Database query failed' });
+      return;
     }
-
-    // Optionally transform the results to ensure valid dates
-    const transformedResults = results.map((result) => {
-      return {
-        ...result,
-        check_in_time: result.check_in_time ? result.check_in_time : "N/A",  // Handle null or empty time
-        check_in_date: result.check_in_date ? result.check_in_date : "N/A",  // Handle null or empty date
-        check_out_date: result.check_out_date ? result.check_out_date : "N/A", // Handle null or empty checkout date
-      };
-    });
-
-    console.log(transformedResults);  // Log to verify transformation (optional)
-
-    // Send back the transformed data
-    res.status(200).json(transformedResults);
+    res.send(results);
   });
 });
 
 
+
+// Route for fetching hoppers data
+app.get('/api/hoppers', (req, res) => {
+  const query = `
+    SELECT suspect_id, name, vehicle_number, COUNT(DISTINCT hotel_id) AS hotel_visits
+    FROM suspect_table
+    LEFT JOIN bookings ON bookings.customer_id = suspect_table.suspect_id
+    WHERE bookings.check_in_date BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE()
+    GROUP BY suspect_table.suspect_id
+    HAVING hotel_visits > 1  -- This will filter for people who have visited more than 1 hotel
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching hoppers:", err);
+      return res.status(500).send("Error fetching hoppers");
+    }
+
+    res.json(results); // Send the fetched hoppers data as JSON
+  });
+});
+
+
+// Get all suspects
+app.get('/api/suspect', (req, res) => {
+  const query = 'SELECT * FROM suspects';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching suspects:', err.message);
+      res.status(500).json({ error: 'Failed to fetch suspects' });
+    } else {
+      res.json(results);
+    }
+  });
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
